@@ -2,9 +2,12 @@
 begin-app
 
 @http
-/api
+/api/decklist
 	method get
-	src /api
+	src /api/decklist
+/api/card
+	method get
+	src /api/card
 
 @static
 folder build
