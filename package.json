@@ -29,6 +29,9 @@
     "not dead",
     "not op_mini all"
   ],
+  "overrides": {
+    "postcss-custom-properties": "^12"
+  },
   "devDependencies": {
     "@architect/sandbox": "^5.2.4",
     "@begin/data": "^4.0.0",
