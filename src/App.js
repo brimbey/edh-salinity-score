@@ -1,54 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import {Aggregator} from "./aggregator/Aggregator";
+import { SubmitForm } from './components/SubmitForm';
+import { MainView } from './components/MainView';
+import { defaultTheme, Provider as ProviderV3 } from '@adobe/react-spectrum';
 
-const App = () => {
-  const [message, setMessage] = useState('...loading')
-
-  let decklistUrl = '';
-
-  async function handleChange(event) {
-    const url = event.target.value;
-    decklistUrl = url;
-  };
-
-  useEffect(() => {
-    async function fetchData () {
-      try {
-        console.log(`USING URL :: ${decklistUrl}`);
-        const aggregator = new Aggregator();
-        let data = await (await fetch(`/api/decklist?url=${decklistUrl}`)).json()
-
-        const total = await aggregator.parseDeckList(data.nodes);
-
-        setMessage(`YOUR SALT TOTAL IS ${total}`);
-      } catch (err) {
-        setMessage(err.message)
-      }
-    }
-
-    fetchData()
-  })
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{message}</p>
-
-        <form>
-          <label>
-            Paste your moxfield deck like here
-            <input type="text" name="name" />
-          </label>
-          <input type="submit" value="Submit" onChange={handleChange} />
-        </form>
-      </header>
+// const App = () => {
+//   return (
+//     <div className="App">
+//       <header className="App-header">
+//         <MainView />
+//       </header>
 
 
-    </div>
-  );
+//     </div>
+//   );
+// }
+
+// export default App;
+
+class App extends React.Component {
+  constructor (props) {
+    super(props);
+  }
+
+  render() {
+      return (
+          <ProviderV3 height={`100%`} theme={defaultTheme} colorScheme="dark">
+            <div className="App">
+              <header className="App-header">
+                <MainView />
+              </header>
+            </div>
+          </ProviderV3>
+    );
+  }
 }
 
 export default App;
