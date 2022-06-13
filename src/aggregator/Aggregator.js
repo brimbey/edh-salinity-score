@@ -3,9 +3,6 @@
 export class Aggregator {
     cardList = [];
 
-    constructor() {
-    }
-
     parseDeckList = async (nodes, statusCallBack) => {
         this.cardList = [];
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { SubmitForm } from "./SubmitForm";
 import { Aggregator } from "../aggregator/Aggregator";
 import {Text} from '@adobe/react-spectrum'
@@ -17,12 +17,13 @@ export class MainView extends React.Component {
             case `card`:
                 this.setState({parseStatus: `found ${evn.card}, salt: ${evn.salt}`});
                 break;
+            default:
+                break;
         }
     }
 
     handleListSubmit = async (value) => {
         this.setState({message: `loading...`});
-        const url = value;
         
         const aggregator = new Aggregator();
         let data = await (await fetch(`/api/decklist?url=${value}`)).json()
