@@ -57,7 +57,7 @@ const fetch = require('node-fetch');
 // }
 
 exports.handler = async function http (uri) {
-  const decklist = uri?.queryStringParameters?.url;
+  const decklist = uri.queryStringParameters.url;
   const sha = decklist.substring(decklist.lastIndexOf(`/`) + 1);
 
   console.log(`decklist api hit with sha: ${sha}`);
