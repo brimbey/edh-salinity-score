@@ -31,8 +31,19 @@ const getMoxfieldDeckList = async (sha) => {
   };
 
   let response = await fetch(`https://api.moxfield.com/v2/decks/all/${sha}`, requestOptions);
+
+  console.log(`response :: ${response.statusCode}`);
+  console.log(`json`);
+  prettyPrintJSON(response);
+  
+
   let text = await response.text();
+  console.log(`text :: ${response.text()}`);
+  
   const json = JSON.parse(text);
+
+  console.log(`json 2`);
+  prettyPrintJSON(json);
 
   // console.log(`${JSON.stringify(response}`);
   // prettyPrintJSON(json);
@@ -40,8 +51,8 @@ const getMoxfieldDeckList = async (sha) => {
 
 
   return {
-    ...json.commanders,
-    ...json.mainboard,
+    ...json?.commanders,
+    ...json?.mainboard,
   }
 }
 
