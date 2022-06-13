@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const prettyPrintJSON = (json) => {
   console.log(`${JSON.stringify(json, null, 4)}`);
@@ -21,7 +21,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
   return json;
 }
 
-exports.handler = async function http (requestObject) {
+export const handler = async function http (requestObject) {
   const cardname = requestObject?.queryStringParameters?.card;
   console.log(`card api hit with cardname: ${cardname}`);
 

@@ -1,60 +1,60 @@
 const fetch = require('node-fetch');
 
 
-let cardList = [];
+// let cardList = [];
 
-const prettyPrintJSON = (json) => {
-  console.log(`${JSON.stringify(json, null, 4)}`);
-}
+// const prettyPrintJSON = (json) => {
+//   console.log(`${JSON.stringify(json, null, 4)}`);
+// }
 
-const spacify = (text, length, prepend = false, fillerChar = " ") => {
-  text = text.toString();
+// const spacify = (text, length, prepend = false, fillerChar = " ") => {
+//   text = text.toString();
 
-  if (text.length < length) {
-    const delta = length - text.length;
+//   if (text.length < length) {
+//     const delta = length - text.length;
 
-    for (let i = 0; i < delta; i++) {
-      text = prepend ? `${fillerChar}${text}` : `${text}${fillerChar}`;
-    }
-  }
+//     for (let i = 0; i < delta; i++) {
+//       text = prepend ? `${fillerChar}${text}` : `${text}${fillerChar}`;
+//     }
+//   }
 
-  return text;
-};
+//   return text;
+// };
 
-const getMoxfieldDeckList = async (sha) => {
-  console.log(`GETTING DECK LIST`);
+// const getMoxfieldDeckList = async (sha) => {
+//   console.log(`GETTING DECK LIST`);
 
-  const requestOptions = {
-    method: 'GET',
-    redirect: 'follow',
-    'maxRedirects': 20,
-  };
+//   const requestOptions = {
+//     method: 'GET',
+//     redirect: 'follow',
+//     'maxRedirects': 20,
+//   };
 
-  let response = await fetch(`https://api.moxfield.com/v2/decks/all/${sha}`, requestOptions);
+//   let response = await fetch(`https://api.moxfield.com/v2/decks/all/${sha}`, requestOptions);
 
-  console.log(`response :: ${response.statusCode}`);
-  console.log(`json`);
-  prettyPrintJSON(response);
+//   console.log(`response :: ${response.statusCode}`);
+//   console.log(`json`);
+//   prettyPrintJSON(response);
   
 
-  let text = await response.text();
-  console.log(`text :: ${response.text()}`);
+//   let text = await response.text();
+//   console.log(`text :: ${response.text()}`);
   
-  const json = JSON.parse(text);
+//   const json = JSON.parse(text);
 
-  console.log(`json 2`);
-  prettyPrintJSON(json);
+//   console.log(`json 2`);
+//   prettyPrintJSON(json);
 
-  // console.log(`${JSON.stringify(response}`);
-  // prettyPrintJSON(json);
-  // const json = response.json();
+//   // console.log(`${JSON.stringify(response}`);
+//   // prettyPrintJSON(json);
+//   // const json = response.json();
 
 
-  return {
-    ...json?.commanders,
-    ...json?.mainboard,
-  }
-}
+//   return {
+//     ...json?.commanders,
+//     ...json?.mainboard,
+//   }
+// }
 
 exports.handler = async function http (uri) {
   const decklist = uri?.queryStringParameters?.url;
@@ -62,7 +62,7 @@ exports.handler = async function http (uri) {
 
   console.log(`decklist api hit with sha: ${sha}`);
 
-  const nodes = await getMoxfieldDeckList(sha);
+  // const nodes = await getMoxfieldDeckList(sha);
   // cardList = [];
   //
   // const cardnameList = [];
@@ -95,7 +95,7 @@ exports.handler = async function http (uri) {
       'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
     },
     statusCode: 200,
-    body: JSON.stringify({ nodes })
+    body: JSON.stringify({ text: 'dead' })
   }
 }
 
