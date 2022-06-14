@@ -3,7 +3,7 @@ const data = require('@begin/data')
 const begin = require('@architect/functions') // Reads & writes session data
 
 const prettyPrintJSON = (json) => {
-  console.log(`${JSON.stringify(json, null, 4)}`);
+  console.log(`json value: \n${JSON.stringify(json, null, 4)}`);
 }
 
 const getEdhrecCardEntry = async (cardname = '') => {
@@ -13,6 +13,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
   });
 
   console.log(`CACHED VALUE FOR ${cardname} is ${cached?.salt}`);
+  prettyPrintJSON(cached);
 
   if (!cached) {
     const requestOptions = {
