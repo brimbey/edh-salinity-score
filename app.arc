@@ -14,4 +14,4 @@ folder build
 spa true
 
 @aws
-node nodejs16.x
+runtime nodejs16.x
