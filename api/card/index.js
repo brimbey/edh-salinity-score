@@ -50,9 +50,8 @@ exports.handler = async function http (requestObject) {
 
   if (cardname?.length > 0) {
     const sanitizedCardName = cardname?.toLowerCase()
-        .replace(`'`, '')
-        .replace(`,`, '')
-        .replace(` `, '-');
+        .replace(/,|'/g, '')
+        .replace(/ /g, '-');
 
     const card = await getEdhrecCardEntry(sanitizedCardName);
 
