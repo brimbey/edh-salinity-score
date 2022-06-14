@@ -12,10 +12,10 @@ const getEdhrecCardEntry = async (cardname = '') => {
     key: cardname
   });
 
-  console.log(`CACHED VALUE FOR ${cardname} is ${cached?.salt}`);
-  prettyPrintJSON(cached);
+  
+  // prettyPrintJSON(cached);
 
-  if (!cached) {
+  if (!cached?.data?.salt) {
     const requestOptions = {
       'method': 'GET',
       'hostname': 'cards.edhrec.com',
@@ -38,8 +38,9 @@ const getEdhrecCardEntry = async (cardname = '') => {
     return json;
   }
 
+  console.log(`RETURNING CACHED VALUE FOR ${cardname}: ${cached?.data?.salt}`);
   return {
-    salt: cached.salt,
+    salt: cached.data.salt,
   }
   
 }
