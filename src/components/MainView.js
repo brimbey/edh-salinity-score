@@ -2,6 +2,7 @@ import React from 'react';
 import { SubmitForm } from "./SubmitForm";
 import { Aggregator } from "../aggregator/Aggregator";
 import {Text} from '@adobe/react-spectrum'
+import styles from './MainView.css';
 
 export class MainView extends React.Component {
 
@@ -10,6 +11,11 @@ export class MainView extends React.Component {
 
         this.setState({message: ""});
         this.setState({parseStatus: ""});
+        this.setState({deckDisplayData: {
+            author: "",
+            authorAvatarUrl: "",
+            title: "",
+        }})
     }
 
     getUrlParam = () => {
@@ -36,17 +42,29 @@ export class MainView extends React.Component {
     }
 
     handleListSubmit = async (value) => {
-        this.setState({message: `loading...`});
+        try {
+            this.setState({message: `loading...`});
 
-        window.history.pushState(null, '', `?url=${value}`);
-        
-        const aggregator = new Aggregator();
-        let data = await (await fetch(`/api/decklist?url=${value}`)).json()
+            window.history.pushState(null, '', `?url=${value}`);
+            
+            const aggregator = new Aggregator();
+            let data = await (await fetch(`/api/decklist?url=${value}`)).json()
 
-        const total = await aggregator.parseDeckList(data.nodes, this.handleAggregatorStatusUpdate);
+            this.setState({
+                deckDisplayData: {
+                    author: data?.deck?.author?.userName,
+                    authorAvatarUrl: data?.deck?.author?.profileImageUrl,
+                    title: data?.deck?.name,
+                }   
+            });
 
-        this.setState({message: `SALT TOTAL: ${total}`});
-        this.setState({parseStatus: ``});
+            const total = await aggregator.parseDeckList(data?.deck?.cards, this.handleAggregatorStatusUpdate);
+
+            this.setState({message: `SALT TOTAL: ${total}`});
+            this.setState({parseStatus: ``});
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     componentDidMount = () => {
@@ -59,6 +77,9 @@ export class MainView extends React.Component {
     render() {
         const message = this?.state?.message;
         const parseStatus = this?.state?.parseStatus;
+        const author = this?.state?.deckDisplayData?.author;
+        const avatar = this?.state?.deckDisplayData?.authorAvatarUrl;
+        const name = this?.state?.deckDisplayData?.title;
         const param = this.getUrlParam();
 
         return (
@@ -66,8 +87,20 @@ export class MainView extends React.Component {
                 <img src="https://www.clipartkey.com/mpngs/b/195-1953707_italian-chef-clip-art.png" width="100px" alt="MMM SALT!" />
                 <div style={{ width: '100%'}}> 
                     <SubmitForm listSubmitHandler={this.handleListSubmit} initialListUrl={param} />
-                    {/* <div>{message}</div>
-                    <div>{parseStatus}</div> */}
+                </div>
+                <div>
+                    {author && 
+                        <div> 
+                            <span className={styles.authorText}>
+                                <img src={avatar} width="75px" alt="avatar" />
+                                {/* {author} */}
+                            </span>
+                            <span className={styles.AuthorText}>
+                                {name}
+                                {/* Deck name: {name} */}
+                            </span>
+                        </div>
+                    }
                 </div>
                 <div>
                     <Text>{message}</Text>

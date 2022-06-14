@@ -14,27 +14,32 @@ const getMoxfieldDeckList = async (sha) => {
   };
 
   let response = await fetch(`https://api.moxfield.com/v2/decks/all/${sha}`, requestOptions);
-
-  console.log(`response :: ${response.statusCode}`);
-  console.log(`json`);
-  prettyPrintJSON(response);
-  
-
   let text = await response.text();
-  
   const json = JSON.parse(text);
 
-  console.log(`json 2`);
-  prettyPrintJSON(json);
-
-  // console.log(`${JSON.stringify(response}`);
-  // prettyPrintJSON(json);
-  // const json = response.json();
-
+  let legal = json?.format === "commander" && json?.mainboardCount === 100;
+  console.log(`legal: ${legal}; format ${json?.format}, count: ${json?.mainboardCount}`);
+  
+  if (legal) {
+    // json?.mainboard?.forEach((data) => {
+    //   if (data?.card?.legalities?.commander !== "legal") {
+    //     console.log(`FOUND ILLEGAL CARD :: ${card?.card?.name}`)
+    //     legal = false;
+    //   }
+    // });
+  }
 
   return {
-    ...json?.commanders,
-    ...json?.mainboard,
+    cards: {
+      ...json?.commanders,
+      ...json?.mainboard,
+    },
+    author: {
+      ...json?.createdByUser,
+    },
+    url: json?.publicUrl,
+    name: json?.name,
+    legal: legal,
   }
 }
 
@@ -44,7 +49,7 @@ exports.handler = async function http (uri) {
 
   console.log(`decklist api hit with sha: ${sha}`);
 
-  const nodes = await getMoxfieldDeckList(sha);
+  const deck = await getMoxfieldDeckList(sha);
 
   return {
     headers: {
@@ -52,7 +57,7 @@ exports.handler = async function http (uri) {
       'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
     },
     statusCode: 200,
-    body: JSON.stringify({ nodes })
+    body: JSON.stringify({ deck })
   }
 }
 

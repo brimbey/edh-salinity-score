@@ -4,8 +4,6 @@ import { TextField } from "@adobe/react-spectrum";
 import { Button } from "@adobe/react-spectrum";
 import {Text} from '@adobe/react-spectrum'
 
-// import { Bell } from "@adobe/react-spectrum"
-
 export class SubmitForm extends React.Component {
 
   currentDeckUrl = ``;
@@ -26,13 +24,20 @@ export class SubmitForm extends React.Component {
 
   render() {
       return (
-        <div style={{width: "800px", display: "inline-block", height: '100%'}}>
-          <TextField label="Paste your moxfield deck like here" onChange={this.handleOnChange} width="100%" />
-          <div style={{ 'padding-top': '20px'}}>
-            <Button onPress={this.handleOnPress} >
-              <Text>Submit</Text>
-            </Button>
-          </div>
+        
+        <div style={{ padding: '20px'}}>
+              <TextField 
+                label="Paste the URL for your decklist here (currently only Moxfield is supported):" 
+                onChange={this.handleOnChange} 
+                width="100%" 
+                maxWidth="800px" 
+                autoFocus={true} 
+              />
+              <div style={{ 'padding-top': '20px'}}>
+                <Button onPress={this.handleOnPress} >
+                  <Text>Submit</Text>
+                </Button>
+              </div>
         </div>
       )
   }
