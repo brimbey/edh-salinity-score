@@ -31,7 +31,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
     await data.set({
       table: 'cached-card-list',
       key: cardname,
-      salt: json.salt,
+      data: { salt: json.salt },
     })
   
     return json;
@@ -45,6 +45,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
 
 exports.handler = async function http (requestObject) {
   const cardname = requestObject?.queryStringParameters?.card;
+  console.log(`WHAT`);
   console.log(`card api hit with cardname: ${cardname}`);
 
   if (cardname?.length > 0) {
