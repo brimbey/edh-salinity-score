@@ -12,3 +12,6 @@ begin-app
 @static
 folder build
 spa true
+
+@aws
+node nodejs16.x
