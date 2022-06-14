@@ -40,6 +40,7 @@ export class MainView extends React.Component {
 
         return (
             <div style={{ width: '100%' }}>
+                <img src="https://www.clipartkey.com/mpngs/b/195-1953707_italian-chef-clip-art.png" width="100px" />
                 <div style={{ width: '100%'}}> 
                     <SubmitForm listSubmitHandler={this.handleListSubmit} />
                     {/* <div>{message}</div>
