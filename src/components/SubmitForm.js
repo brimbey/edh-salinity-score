@@ -12,6 +12,7 @@ export class SubmitForm extends React.Component {
 
   static propTypes = {
     listSubmitHandler: PropTypes.func,
+    initialListUrl: PropTypes.string,
   }
 
   handleOnPress = (event) => {
