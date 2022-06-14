@@ -12,7 +12,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
     key: cardname
   });
 
-  console.log(`CACHED VALUE FOR ${cardname} is ${cached}`);
+  console.log(`CACHED VALUE FOR ${cardname} is ${cached?.salt}`);
 
   if (!cached) {
     const requestOptions = {
@@ -45,12 +45,12 @@ const getEdhrecCardEntry = async (cardname = '') => {
 
 exports.handler = async function http (requestObject) {
   const cardname = requestObject?.queryStringParameters?.card;
-  console.log(`WHAT`);
   console.log(`card api hit with cardname: ${cardname}`);
 
   if (cardname?.length > 0) {
     const sanitizedCardName = cardname?.toLowerCase()
         .replace(`'`, '')
+        .replace(`,`, '')
         .replace(` `, '-');
 
     const card = await getEdhrecCardEntry(sanitizedCardName);
