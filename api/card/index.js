@@ -1,46 +1,24 @@
 const fetch = require('node-fetch');
-const data = require('@begin/data')
-const begin = require('@architect/functions') // Reads & writes session data
 
 const prettyPrintJSON = (json) => {
   console.log(`${JSON.stringify(json, null, 4)}`);
 }
 
 const getEdhrecCardEntry = async (cardname = '') => {
-  let cached = await data.get({
-    table: 'cached-card-list',
-    key: cardname
-  });
+  const requestOptions = {
+    'method': 'GET',
+    'hostname': 'cards.edhrec.com',
+    'path': '/thassas-oracle',
+    'headers': {
+    },
+    'maxRedirects': 20
+  };
 
-  console.log(`CACHED VALUE FOR ${cardname} is ${cached}`);
+  const response = await fetch(`https://cards.edhrec.com/${cardname}`, requestOptions);
+  const text = await response.text();
+  const json = JSON.parse(text);
 
-  if (!cached) {
-    const requestOptions = {
-      'method': 'GET',
-      'hostname': 'cards.edhrec.com',
-      'path': '/thassas-oracle',
-      'headers': {
-      },
-      'maxRedirects': 20
-    };
-  
-    const response = await fetch(`https://cards.edhrec.com/${cardname}`, requestOptions);
-    const text = await response.text();
-    const json = JSON.parse(text);
-
-    await data.set({
-      table: 'cached-card-list',
-      key: cardname,
-      salt: json.salt,
-    })
-  
-    return json;
-  }
-
-  return {
-    salt: cached.salt,
-  }
-  
+  return json;
 }
 
 exports.handler = async function http (requestObject) {
