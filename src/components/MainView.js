@@ -63,7 +63,7 @@ export class MainView extends React.Component {
             this.setState({message: `SALT TOTAL: ${total}`});
             this.setState({parseStatus: ``});
 
-            const persistResponse = await fetch(`/api/salt`, {
+            await fetch(`/api/salt`, {
                 method: "POST",
                 body: JSON.stringify({
                     url: data?.deck?.url,
