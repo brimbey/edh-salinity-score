@@ -8,6 +8,9 @@ begin-app
 /api/card
 	method get
 	src /api/card
+/api/salt
+	method post
+	src /api/salt
 
 @static
 folder build
