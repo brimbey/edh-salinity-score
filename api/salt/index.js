@@ -47,21 +47,22 @@ const getEdhrecCardEntry = async (cardname = '') => {
 }
 
 const persistDeckList = async (body) => {
+  console.log(`persisting data... `);
+  prettyPrintJSON(body);
+
   await data.set({
     table: 'cached-deck-list',
     key: body.url,
     data: { ...body },
   })
+
+  console.log(`... done`);
 }
 
 exports.handler = async function http (requestObject) {
   try {
-    console.log('ERMAGAWD');
     const body = parseBody(requestObject); // Pass the entire request object
-    console.log(`BODY :: ${body.toString()}`);
-    prettyPrintJSON(body);
-    
-    persistDeckList(body);
+    await persistDeckList(body);
     
     return {
       headers: {
