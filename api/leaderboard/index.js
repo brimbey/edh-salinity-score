@@ -16,13 +16,18 @@ const getSaltList = async () => {
   console.log(`GOT CACHED!`);
   prettyPrintJSON(cached);
   
-
-
-  return [
-        {
-            data: {}
+  try {
+    return cached.map((deck) => {
+        return {
+            ...deck.data,
         }
-    ]
+    })
+  } catch (error) {
+    console.log(`[ERROR] ${error}`);
+  }
+
+  // default
+  return []
 }
 
 exports.handler = async function http () {

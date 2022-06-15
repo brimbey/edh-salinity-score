@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const data = require('@begin/data')
 let arc = require('@architect/functions')
 let parseBody = arc.http.helpers.bodyParser
@@ -15,7 +14,11 @@ const persistDeckList = async (body) => {
   await data.set({
     table: 'cached-deck-list',
     key: urlSlug,
-    data: { ...body },
+    data: { 
+      ...body, 
+      dateLastIndexed: ``,
+      timesIndexed: ``,
+    },
   })
 
   console.log(`... done`);
