@@ -3,6 +3,7 @@ import { SubmitForm } from "./SubmitForm";
 import { Aggregator } from "../aggregator/Aggregator";
 import {Text} from '@adobe/react-spectrum'
 import styles from './MainView.css';
+import { LeaderBoard } from './LeaderBoard';
 
 export class MainView extends React.Component {
 
@@ -63,7 +64,7 @@ export class MainView extends React.Component {
             this.setState({message: `SALT TOTAL: ${total}`});
             this.setState({parseStatus: ``});
 
-            await fetch(`/api/salt`, {
+            await fetch(`/api/saltmine`, {
                 method: "POST",
                 body: JSON.stringify({
                     url: data?.deck?.url,
@@ -78,11 +79,13 @@ export class MainView extends React.Component {
         }
     };
 
-    componentDidMount = () => {
+    componentDidMount = async () => {
         const param = this.getUrlParam();
         if (param) {
             this.handleListSubmit(param);
         }
+
+        let data = await (await fetch(`/api/leaderboard`)).json();
     }
 
     render() {
@@ -119,6 +122,7 @@ export class MainView extends React.Component {
                 <div>
                     <Text>{parseStatus}</Text>
                 </div>
+                <LeaderBoard />
             </div>
         )
     }
