@@ -85,7 +85,7 @@ export class MainView extends React.Component {
             this.handleListSubmit(param);
         }
 
-        let data = await (await fetch(`/api/leaderboard`)).json();
+        await (await fetch(`/api/leaderboard`)).json();
     }
 
     render() {
