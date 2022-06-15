@@ -43,16 +43,16 @@ const getEdhrecCardEntry = async (cardname = '') => {
   return {
     salt: cached.data.salt,
   }
-  
 }
 
 const persistDeckList = async (body) => {
-  console.log(`persisting data... `);
+  const urlSlug = body?.url?.substring(body?.url?.lastIndexOf(`/`) + 1);
+  console.log(`persisting data for decklist ${body.url}; slug: ${urlSlug}`);
   prettyPrintJSON(body);
 
   await data.set({
     table: 'cached-deck-list',
-    key: body.url,
+    key: urlSlug,
     data: { ...body },
   })
 
@@ -62,7 +62,7 @@ const persistDeckList = async (body) => {
 exports.handler = async function http (requestObject) {
   try {
     const body = parseBody(requestObject); // Pass the entire request object
-    await persistDeckList(body);
+    await persistDeckList(JSON.parse(body));
     
     return {
       headers: {
