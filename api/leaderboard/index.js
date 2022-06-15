@@ -1,4 +1,6 @@
-const fetch = require('node-fetch');
+const data = require('@begin/data')
+let arc = require('@architect/functions')
+let parseBody = arc.http.helpers.bodyParser
 
 const prettyPrintJSON = (json) => {
   console.log(`${JSON.stringify(json, null, 4)}`);
