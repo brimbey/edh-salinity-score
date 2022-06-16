@@ -1,27 +1,39 @@
 import React from 'react';
-import {Cell, Column, Row, TableView, TableBody, TableHeader} from '@adobe/react-spectrum'
+import {Cell, Column, Row, TableView, TableBody, TableHeader, Text} from '@adobe/react-spectrum'
+import { ActionButton } from "@adobe/react-spectrum";
 
 const stubData = [
+  {
+    "salt": 43.3105255085861,
+    "title": "No one drinks Jobu's Rum.",
+    "dateLastIndexed": "",
+    "url": "https://www.moxfield.com/decks/iAIy9Vg85kGP4P0FCdooOg",
+    "author": "Khan187",
+    "timesIndexed": ""
+  },
   {
     "salt": 97.15755206945028,
     "title": "p.esper. - i hate you",
     "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
     "author": "bobkozilek",
-    "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
+    "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8",
+    "authorProfileUrl": "http://google.com",
+  },
+{
+  "salt": 97.15755206945028,
+  "title": "p.esper. - i hate you",
+  "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
+  "author": "bobkozilek",
+  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8",
+  "authorProfileUrl": "http://google.com",
 },
 {
   "salt": 97.15755206945028,
   "title": "p.esper. - i hate you",
   "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
   "author": "bobkozilek",
-  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
-},
-{
-  "salt": 97.15755206945028,
-  "title": "p.esper. - i hate you",
-  "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
-  "author": "bobkozilek",
-  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
+  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8",
+  "authorProfileUrl": "http://google.com",
 },
   {
       "salt": 28.64082332404426,
@@ -63,7 +75,7 @@ export class LeaderBoard extends React.Component {
     
     console.log(`GOT :: ${JSON.stringify(results)}`);
 
-    const decks = results; //stubData
+    const decks = results;// stubData;
     // stubData.forEach((item) => {
     // results.forEach((item) => {
     for (let i = 0; i < decks?.length; i++) {
@@ -85,18 +97,36 @@ export class LeaderBoard extends React.Component {
   componentDidMount = async () => {
     this.refreshGridList();
   }
+
+  openLinkFromGrid = (link) => {
+    // console.log(`LINK :: ${link}`);
+    
+    if (link) {
+      window.location.href = link;
+    }
+  }
     
   getCellRenderer = ((item, columnKey) => {
-    console.log(`FOUND COLUMN KEY :: ${columnKey}`);
-    console.log(`FOUND AUTHOR :: ${item?.author}`);
-    // console.log(`FOUND COLUMN KEY :: ${JSON.stringify(item)}`);
-    //alt={item.author}
-
-
     let content;
 
     if (columnKey === "authorAvatarUrl") {
-      content = <img src={item[columnKey]} height="25px" alt="user avatar"  />
+      const avatarUrl = item?.[columnKey] || `/resources/blank-user-avatar.png`;
+      const authorUrl = item?.authorProfileUrl;
+      console.log(`found: ${authorUrl}`);
+
+      content =
+        <ActionButton aria-label={item.author} onPress={() => { this.openLinkFromGrid(`${item?.authorProfileUrl}`) }}>
+          <img src={avatarUrl} height="25px" alt={item.author}  />
+        </ActionButton>;
+    } else if (columnKey === "url") {
+      const url = item?.url;
+      console.log(`found deck url: ${url}`);
+      const title = `${item.title}`;
+
+      content =
+        <ActionButton aria-label={title} onPress={() => { this.openLinkFromGrid(`${item?.url}`) }}>
+          <Text style={{float: 'left'}}>{title}</Text>
+        </ActionButton>;
     } else {
       content = item[columnKey];
     }
@@ -107,46 +137,65 @@ export class LeaderBoard extends React.Component {
     );
   });
 
+  getColumnRenderer = ((item) => {
+    let content;
+
+    if (item.uid === "salt") {
+      content =
+      <img src="/resources/salt-shaker.png" height="25px" alt="Salt Score"  />
+    } else {
+      content = item.name;
+    }
+
+
+    return (
+      <div>
+        {content}
+      </div>
+    );
+  });
+
   render() {
     let columns = [
-        {name: '', uid: 'authorAvatarUrl'},
-        {name: 'Username', uid: 'author'},
-        {name: 'Deck', uid: 'title'},
-        {name: 'DA SALT', uid: 'salt'}
+        {name: '', uid: 'authorAvatarUrl', maxWidth: 15},
+        // {name: 'Username', uid: 'author'},
+        {name: 'Deck', uid: 'url'},
+        {name: 'DA SALT', uid: 'salt', maxWidth: 100}
       ];
       
     let rows = this?.state?.dataSet || [];
 
-    return (
-      <div style={{ padding: '20px', width: "100%"}}>
-        <div style={{display: "inline-block", width: "100%"}}>
-          <TableView
-            aria-label="Example table with dynamic content"
-            width="100%" 
-            maxWidth="800px">
-            <TableHeader columns={columns}>
-              {column => (
-                <Column
-                  key={column.uid}
-                  align={column.uid === 'date' ? 'end' : 'start'}>
-                  {column.name}
-                </Column>
-              )}
-            </TableHeader>
-            <TableBody items={rows}>
-              {item => (
-                <Row>
-                  {columnKey => this.getCellRenderer(item, columnKey)}
-                </Row>
-              )}
-              {/* {item => (
-                <Row>
-                  {columnKey => <Cell>{item[columnKey]}</Cell>}
-                </Row>
-              )} */}
-            </TableBody>
-          </TableView>
-        </div>
+    return (      
+      <div style={{ padding: '20px'}}>
+        <TableView
+          aria-label="All time salt index"
+          density='compact'
+          width='static-size-6000' 
+        >
+          <TableHeader columns={columns}>
+            {column => (
+              <Column
+                key={column.uid}
+                align={column.uid === 'authorAvatarUrl' ? 'start' : 'start'}
+                maxWidth={column.maxWidth}
+              >
+                {this.getColumnRenderer(column)}
+              </Column>
+            )}
+          </TableHeader>
+          <TableBody items={rows}>
+            {item => (
+              <Row>
+                {columnKey => this.getCellRenderer(item, columnKey)}
+              </Row>
+            )}
+            {/* {item => (
+              <Row>
+                {columnKey => <Cell>{item[columnKey]}</Cell>}
+              </Row>
+            )} */}
+          </TableBody>
+        </TableView>
       </div>
     );
   }

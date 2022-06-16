@@ -97,8 +97,8 @@ export class MainView extends React.Component {
         const param = this.getUrlParam();
 
         return (
-            <div style={{ width: '100%' }}>
-                <img src="https://www.clipartkey.com/mpngs/b/195-1953707_italian-chef-clip-art.png" width="100px" alt="MMM SALT!" />
+            <div>
+                <img src="resources/chef-kiss.png" width="100px" alt="MMM SALT!" />
                 <div style={{ width: '100%'}}> 
                     <SubmitForm listSubmitHandler={this.handleListSubmit} initialListUrl={param} />
                 </div>
@@ -122,7 +122,9 @@ export class MainView extends React.Component {
                 <div>
                     <Text>{parseStatus}</Text>
                 </div>
-                <LeaderBoard />
+                <div style={{ width: '100%'}}> 
+                    <LeaderBoard />
+                </div>
             </div>
         )
     }
