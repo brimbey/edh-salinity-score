@@ -1,9 +1,14 @@
 const data = require('@begin/data')
-let arc = require('@architect/functions')
+let arc = require('@architect/functions');
+// const { APIUtils } = require('../common/APIUtils');
 let parseBody = arc.http.helpers.bodyParser
 
 const prettyPrintJSON = (json) => {
   console.log(`${JSON.stringify(json, null, 4)}`);
+}
+
+const formatSalt = (value) => {
+    return Math.ceil(value * 10000) / 10000;
 }
 
 const getSaltList = async () => {
@@ -16,18 +21,27 @@ const getSaltList = async () => {
   console.log(`GOT CACHED!`);
   prettyPrintJSON(cached);
   
+
+  let retData = [];
+
   try {
-    return cached.map((deck) => {
+    retData = cached.map((deck) => {
         return {
             ...deck.data,
+            salt: formatSalt(deck.data.salt),
         }
-    })
+    });
+
+    retData = retData.sort((a, b) => {
+        return b?.salt - a?.salt;
+    });
   } catch (error) {
     console.log(`[ERROR] ${error}`);
+    retData = [];
   }
 
   // default
-  return []
+  return retData;
 }
 
 exports.handler = async function http () {

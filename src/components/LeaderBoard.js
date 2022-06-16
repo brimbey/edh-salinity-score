@@ -2,27 +2,27 @@ import React from 'react';
 import {Cell, Column, Row, TableView, TableBody, TableHeader} from '@adobe/react-spectrum'
 
 const stubData = [
-    {
-      "salt": 97.15755206945028,
-      "title": "p.esper. - i hate you",
-      "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
-      "author": "bobkozilek",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
-  },
   {
     "salt": 97.15755206945028,
     "title": "p.esper. - i hate you",
     "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
     "author": "bobkozilek",
     "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
-  },
-  {
-    "salt": 97.15755206945028,
-    "title": "p.esper. - i hate you",
-    "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
-    "author": "bobkozilek",
-    "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
-  },
+},
+{
+  "salt": 97.15755206945028,
+  "title": "p.esper. - i hate you",
+  "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
+  "author": "bobkozilek",
+  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
+},
+{
+  "salt": 97.15755206945028,
+  "title": "p.esper. - i hate you",
+  "url": "https://www.moxfield.com/decks/1zPcEmFwXUGEWW2-U1sQhg",
+  "author": "bobkozilek",
+  "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8"
+},
   {
       "salt": 28.64082332404426,
       "author": "grumbledore",
@@ -48,7 +48,6 @@ const stubData = [
   }
 ];
 
-
 export class LeaderBoard extends React.Component {
 
   constructor(props) {
@@ -61,17 +60,26 @@ export class LeaderBoard extends React.Component {
     const results = await (await fetch(`/api/leaderboard`)).json();
 
     const data = [];
-    let id = 0;
+    
+    console.log(`GOT :: ${JSON.stringify(results)}`);
+
+    const decks = results; //stubData
     // stubData.forEach((item) => {
-    results.forEach((item) => {
-      id = id + 1;
+    // results.forEach((item) => {
+    for (let i = 0; i < decks?.length; i++) {
+      const item = decks[i];
+
       console.log(`found :: ${item.url}`);
       data.push({
-        id: `${id}`,
+        id: `decklist_id_${i}`,
         ...item,
       })
-    });
+    };
+
     this.setState({ dataSet: data });
+
+    // TODO: remove
+    stubData.push({});
   }
 
   componentDidMount = async () => {
@@ -80,12 +88,15 @@ export class LeaderBoard extends React.Component {
     
   getCellRenderer = ((item, columnKey) => {
     console.log(`FOUND COLUMN KEY :: ${columnKey}`);
+    console.log(`FOUND AUTHOR :: ${item?.author}`);
     // console.log(`FOUND COLUMN KEY :: ${JSON.stringify(item)}`);
+    //alt={item.author}
+
 
     let content;
 
     if (columnKey === "authorAvatarUrl") {
-      content = <img src={item[columnKey]} height="25px" />
+      content = <img src={item[columnKey]} height="25px" alt="user avatar"  />
     } else {
       content = item[columnKey];
     }

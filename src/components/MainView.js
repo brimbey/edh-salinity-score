@@ -72,6 +72,8 @@ export class MainView extends React.Component {
                     authorAvatarUrl: data?.deck?.author?.profileImageUrl,
                     title: data?.deck?.name,
                     salt: total,
+                    source: `moxfield`,
+                    authorProfileUrl: `https://www.moxfield.com/users/${data?.deck?.author?.userName}`,
                 })
             });
         } catch (error) {
