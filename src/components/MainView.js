@@ -1,9 +1,10 @@
 import React from 'react';
 import { SubmitForm } from "./SubmitForm";
 import { Aggregator } from "../aggregator/Aggregator";
-import {Text} from '@adobe/react-spectrum'
-import styles from './MainView.css';
+import { Flex, View, Header, Divider, Text } from "@adobe/react-spectrum";
+// import styles from './MainView.css';
 import { LeaderBoard } from './LeaderBoard';
+import { ParseProgressIndicator } from './ParseProgressIndicator';
 
 export class MainView extends React.Component {
 
@@ -12,18 +13,40 @@ export class MainView extends React.Component {
 
         this.setState({message: ""});
         this.setState({parseStatus: ""});
+        this.setState({
+            progressStatus: {
+                label: '',
+                percentage: 0,
+            }
+        })
         this.setState({deckDisplayData: {
             author: "",
             authorAvatarUrl: "",
             title: "",
         }})
+        this.setState({isFetching: false});
+        this.setState({ listItems: [] });
     }
+
+    refreshGridList = async () => {
+        const results = await (await fetch(`/api/leaderboard`)).json();
+        const data = [];
+        
+        const decks = results;
+        for (let i = 0; i < decks?.length; i++) {
+          const item = decks[i];
+            data.push({
+            id: `decklist_id_${i}`,
+            ...item,
+          })
+        };
+    
+        this.setState({ listItems: data });
+      }
 
     getUrlParam = () => {
         const href = window.location.href;
         const deckListParam = href.substring(href.indexOf(`?url=`) + 5);
-
-        console.log(`DECKLIST PARAM :: ${deckListParam}`);
 
         if (deckListParam?.substring(0, 4) === `http`) {
             return deckListParam;
@@ -35,7 +58,12 @@ export class MainView extends React.Component {
     handleAggregatorStatusUpdate = (evn) => {
         switch (evn?.type) {
             case `card`:
-                this.setState({parseStatus: `found ${evn.card}, salt: ${evn.salt}`});
+                this.setState({
+                    progressStatus: {
+                        label: `Parsing... ${evn.card}`,
+                        percentage: evn.percentage,
+                    }
+                })
                 break;
             default:
                 break;
@@ -45,6 +73,7 @@ export class MainView extends React.Component {
     handleListSubmit = async (value) => {
         try {
             this.setState({message: `loading...`});
+            this.setState({isFetching: true});
 
             window.history.pushState(null, '', `?url=${value}`);
             
@@ -64,6 +93,8 @@ export class MainView extends React.Component {
             this.setState({message: `SALT TOTAL: ${total}`});
             this.setState({parseStatus: ``});
 
+            this.setState({isFetching: false});
+
             await fetch(`/api/saltmine`, {
                 method: "POST",
                 body: JSON.stringify({
@@ -76,6 +107,8 @@ export class MainView extends React.Component {
                     authorProfileUrl: `https://www.moxfield.com/users/${data?.deck?.author?.userName}`,
                 })
             });
+
+            this.refreshGridList();
         } catch (error) {
             console.log(error);
         }
@@ -84,48 +117,51 @@ export class MainView extends React.Component {
     componentDidMount = async () => {
         const param = this.getUrlParam();
         if (param) {
-            this.handleListSubmit(param);
+            // this.handleListSubmit(param);
         }
+
+        this.refreshGridList();
     }
 
     render() {
-        const message = this?.state?.message;
-        const parseStatus = this?.state?.parseStatus;
-        const author = this?.state?.deckDisplayData?.author;
-        const avatar = this?.state?.deckDisplayData?.authorAvatarUrl;
-        const name = this?.state?.deckDisplayData?.title;
-        const param = this.getUrlParam();
-
+        const progressLabel = this?.state?.progressStatus?.label || '';
+        const progressValue = this?.state?.progressStatus?.percentage || 0;
+        const isFetching = this?.state?.isFetching || false;
+        const items = this?.state?.listItems || [];
+        // const param = this.getUrlParam();
+        
         return (
-            <div>
-                <img src="resources/chef-kiss.png" width="100px" alt="MMM SALT!" />
-                <div style={{ width: '100%'}}> 
-                    <SubmitForm listSubmitHandler={this.handleListSubmit} initialListUrl={param} />
-                </div>
-                <div>
-                    {author && 
-                        <div> 
-                            <span className={styles.authorText}>
-                                <img src={avatar} width="75px" alt="avatar" />
-                                {/* {author} */}
-                            </span>
-                            <span className={styles.AuthorText}>
-                                {name}
-                                {/* Deck name: {name} */}
-                            </span>
-                        </div>
-                    }
-                </div>
-                <div>
-                    <Text>{message}</Text>
-                </div>
-                <div>
-                    <Text>{parseStatus}</Text>
-                </div>
-                <div style={{ width: '100%'}}> 
-                    <LeaderBoard />
-                </div>
-            </div>
+            <View>
+                <View style={{position: 'absolute', top: 0}}>
+                    <Header>
+                        <Text size="L">EDH Salt Index</Text>
+                    </Header>
+                    <Divider size="M" />
+                </View>
+                <div style={{height: "100px"}} />
+                <View alignItems="center">
+                    <Flex 
+                        direction="column"  
+                        alignItems="center"
+                        margin="size-200"
+                        gap="size-100" >
+                        <img src="resources/chef-kiss.png" width="100px" alt="MMM SALT!" />
+                        
+                        <div style={{height: "50px"}} />
+                        
+                        <Flex direction="column" width="100%" maxWidth="800px">
+                            {isFetching
+                                ? <ParseProgressIndicator label={progressLabel} progress={progressValue} />
+                                : <SubmitForm listSubmitHandler={this.handleListSubmit} />// initialListUrl={param} />
+                            }
+                        
+                        <div style={{height: "100px"}} />
+                        
+                            <LeaderBoard items={items} />
+                        </Flex>
+                    </Flex>
+                </View>
+            </View>
         )
     }
 }
