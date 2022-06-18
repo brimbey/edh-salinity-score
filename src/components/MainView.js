@@ -1,6 +1,7 @@
 import React from 'react';
 import { SubmitForm } from "./SubmitForm";
 import { Aggregator } from "../aggregator/Aggregator";
+import { Preview } from "./Preview";
 import { Flex, View, Header, Divider, Text } from "@adobe/react-spectrum";
 // import styles from './MainView.css';
 import { LeaderBoard } from './LeaderBoard';
@@ -78,9 +79,11 @@ export class MainView extends React.Component {
             
             const aggregator = new Aggregator();
             let data = await (await fetch(`/api/deck?url=${value}`)).json()
+            const commanders = Object.keys(data?.deck?.commanders);
 
             this.setState({
                 deckDisplayData: {
+                    commanders,
                     author: data?.deck?.author?.userName,
                     authorAvatarUrl: data?.deck?.author?.profileImageUrl,
                     title: data?.deck?.name,
@@ -94,12 +97,15 @@ export class MainView extends React.Component {
 
             this.setState({isFetching: false});
 
+            
+
             await fetch(`/api/persist`, {
                 method: "POST",
                 body: JSON.stringify({
                     url: data?.deck?.url,
                     author: data?.deck?.author?.userName,
                     authorAvatarUrl: data?.deck?.author?.profileImageUrl,
+                    commanders,
                     title: data?.deck?.name,
                     salt: total,
                     source: `moxfield`,
@@ -121,6 +127,22 @@ export class MainView extends React.Component {
 
         this.refreshGridList();
     }
+
+    stubDeckData = {
+        "id": "ccdf233e4ef583c3d07e2e68da09abcsdfq3r9",
+        data: {
+          "salt": 81.8462,
+          "author": "grumbledore",
+          "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
+          "source": "moxfield",
+          "title": "Sen Triplets, Friendship Ruination Committee",
+          "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
+          "dateLastIndexed": "",
+          "url": "https://www.moxfield.com/decks/sHgMapORlEmNzZEGb_nrRw",
+          "timesIndexed": "",
+          "id": "c7940c28156dbde0339dc204d94e7c12"
+        }
+      };
 
     render() {
         const progressLabel = this?.state?.progressStatus?.label || '';
@@ -153,11 +175,11 @@ export class MainView extends React.Component {
                                 ? <ParseProgressIndicator label={progressLabel} progress={progressValue} />
                                 : <SubmitForm listSubmitHandler={this.handleListSubmit} />// initialListUrl={param} />
                             }
-                        
+                        </Flex>
+                        <Preview deck={this.stubDeckData} />
                         <div style={{height: "100px"}} />
                         
-                            <LeaderBoard items={items} />
-                        </Flex>
+                        <LeaderBoard items={items} />
                     </Flex>
                 </View>
             </View>

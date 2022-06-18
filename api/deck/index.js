@@ -30,6 +30,9 @@ const getMoxfieldDeckList = async (sha) => {
   }
 
   return {
+    commanders: {
+      ...json?.commanders,
+    },
     cards: {
       ...json?.commanders,
       ...json?.mainboard,

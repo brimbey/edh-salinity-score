@@ -23,7 +23,9 @@ export class LeaderBoard extends React.Component {
       console.log(`found: ${authorUrl}`);
 
       content =
-        <img src={avatarUrl} height="25px" alt={item.author}  />
+        <img src={avatarUrl} height="30px" alt={item.author}  />
+    } else if (columnKey === "commanders") {
+      content = item[columnKey]?.toString().replace(`,`, `, `);
     } else {
       content = item[columnKey];
     }
@@ -57,14 +59,17 @@ export class LeaderBoard extends React.Component {
 
   render() {
     let columns = [
-      {name: 'USER', uid: 'authorAvatarUrl', maxWidth: 15},
-      {name: 'Deck', uid: 'title'},
-      {name: '', uid: 'salt', width: 100}
+      {name: 'USER', uid: 'authorAvatarUrl', maxWidth: 25},
+      // {name: 'Deck', uid: 'title'},
+      {name: 'Commander(s)', uid: 'commanders'},
+      {name: 'Title', uid: 'title'},
+      {name: '', uid: 'salt', width: 125}
     ];
 
     return (      
       <Flex 
-        gap="size-100" 
+        gap="size-0"
+        margin="size-0"
         maxWidth="1000px"
         width="100%">
         <TableView
