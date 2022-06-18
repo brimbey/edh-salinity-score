@@ -48,7 +48,7 @@ const getMoxfieldDeckList = async (sha) => {
 
 exports.handler = async function http (requestObject) {
   const url = requestObject.queryStringParameters.url;
-  const sha = url.substring(url.lastIndexOf(`/`) + 1);
+  const sha = url?.substring(url?.lastIndexOf(`/`) + 1);
 
   console.log(`deck api hit with sha: ${sha}`);
 

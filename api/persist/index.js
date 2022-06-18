@@ -14,25 +14,32 @@ const persistDeckList = async (body) => {
   const urlSlug = body?.url?.substring(body?.url?.lastIndexOf(`/`) + 1);
 
   console.log(`persisting data for decklist ${body.url}; slug: ${urlSlug}`);
-  prettyPrintJSON(body);
-
-  await data.set({
-    table: 'decks',
+  
+  const deckData = {
     id,
     data: { 
       ...body, 
       dateLastIndexed: ``,
       timesIndexed: ``,
     },
-  })
+  }
 
-  console.log(`... done`);
+  try {
+    await data.set({
+      table: 'decks',
+      ...deckData,
+    })
+  } catch (error) {
+    console.log(`[ERROR] ${error}`)
+  }
+
+  return deckData;
 }
 
 exports.handler = async function http (requestObject) {
   try {
     const body = parseBody(requestObject); // Pass the entire request object
-    await persistDeckList(JSON.parse(body));
+    const response = await persistDeckList(JSON.parse(body));
     
     return {
       headers: {
@@ -40,6 +47,7 @@ exports.handler = async function http (requestObject) {
         'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
       },
       statusCode: 200,
+      body: JSON.stringify(response),
     }
   } catch (error) {
     console.log(`[ERROR] ${error}`);

@@ -19,7 +19,6 @@ export class SubmitForm extends React.Component {
     this.currentDeckUrl = val;
   }
   
-
   render() {
       return (
         <Flex direction="row" alignItems="end" gap="size-300" maxWidth="800px"
@@ -31,7 +30,7 @@ export class SubmitForm extends React.Component {
                 autoFocus={true} 
               />
               <Button onPress={this.handleOnPress} >
-                <Text>Submit</Text>
+                <Text>Submit&nbsp;&nbsp;&nbsp;</Text>
               </Button>
         </Flex>
       )

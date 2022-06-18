@@ -1,6 +1,7 @@
 import React from 'react';
 import {Cell, Column, Row, TableView, TableBody, TableHeader, Flex} from '@adobe/react-spectrum'
 import PropTypes from "prop-types";
+import './LeaderBoard.css';
 
 export class LeaderBoard extends React.Component {
 
@@ -8,10 +9,12 @@ export class LeaderBoard extends React.Component {
     super(props);
 
     this.setState({ dataSet: [] });
+    this.setState({ windowWidth: window.innerWidth });
   }
 
   static propTypes = {
     items: PropTypes.array,
+    selectionHandler: PropTypes.func,
   }
 
   getCellRenderer = ((item, columnKey) => {
@@ -19,9 +22,7 @@ export class LeaderBoard extends React.Component {
 
     if (columnKey === "authorAvatarUrl" && item.url) {
       const avatarUrl = item?.[columnKey] || `/resources/blank-user-avatar.png`;
-      const authorUrl = item?.authorProfileUrl;
-      console.log(`found: ${authorUrl}`);
-
+      
       content =
         <img src={avatarUrl} height="30px" alt={item.author}  />
     } else if (columnKey === "commanders") {
@@ -57,21 +58,51 @@ export class LeaderBoard extends React.Component {
     );
   });
 
+  handleResize = (e) => {
+    this.setState({ windowWidth: window.innerWidth });
+  };
+
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+    this.handleResize();
+  }
+
   render() {
     let columns = [
       {name: 'USER', uid: 'authorAvatarUrl', maxWidth: 25},
       // {name: 'Deck', uid: 'title'},
       {name: 'Commander(s)', uid: 'commanders'},
-      {name: 'Title', uid: 'title'},
-      {name: '', uid: 'salt', width: 125}
     ];
 
-    return (      
+    if (this?.state?.windowWidth > 600) {
+      columns.push(    
+        {name: 'Title', uid: 'title'}
+      );
+    }
+    
+    columns.push(
+      {name: '', uid: 'salt', width: 125}
+    );
+
+    return (
       <Flex 
         gap="size-0"
         margin="size-0"
         maxWidth="1000px"
-        width="100%">
+        width="100%"
+        style={
+          {
+            'overflow-y': 'scroll'
+        }
+        }
+      >
+      {/* <div style={
+        {
+          'overflow-y': 'scroll',
+          width: '100%',
+          height: '100%',
+      }
+      }> */}
         <TableView
           aria-label="All time salt index"
           density='compact'
@@ -79,6 +110,7 @@ export class LeaderBoard extends React.Component {
           width="100%"
           selectionMode="single" 
           selectionStyle="highlight"
+          onSelectionChange={this?.props?.selectionHandler}
         >
           <TableHeader columns={columns}>
             {column => (
@@ -101,6 +133,7 @@ export class LeaderBoard extends React.Component {
             )}
           </TableBody>
         </TableView>
+        {/* </div> */}
       </Flex>
     );
   }

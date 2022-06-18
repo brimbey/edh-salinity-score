@@ -27,6 +27,7 @@ export class MainView extends React.Component {
         }})
         this.setState({isFetching: false});
         this.setState({ listItems: [] });
+        this.setState({ selectedDeck: null });
     }
 
     refreshGridList = async () => {
@@ -46,13 +47,7 @@ export class MainView extends React.Component {
 
     getUrlParam = () => {
         const href = window.location.href;
-        const deckListParam = href.substring(href.indexOf(`?url=`) + 5);
-
-        if (deckListParam?.substring(0, 4) === `http`) {
-            return deckListParam;
-        } 
-
-        return ``;
+        return href.substring(href.indexOf(`?sha=`) + 5) || ``;
     }
 
     handleAggregatorStatusUpdate = (evn) => {
@@ -74,8 +69,6 @@ export class MainView extends React.Component {
         try {
             this.setState({message: `loading...`});
             this.setState({isFetching: true});
-
-            window.history.pushState(null, '', `?url=${value}`);
             
             const aggregator = new Aggregator();
             let data = await (await fetch(`/api/deck?url=${value}`)).json()
@@ -97,9 +90,7 @@ export class MainView extends React.Component {
 
             this.setState({isFetching: false});
 
-            
-
-            await fetch(`/api/persist`, {
+            const response = await fetch(`/api/persist`, {
                 method: "POST",
                 body: JSON.stringify({
                     url: data?.deck?.url,
@@ -113,46 +104,57 @@ export class MainView extends React.Component {
                 })
             });
 
-            this.refreshGridList();
+            await this.refreshGridList();
+            
+            const newDeckJson = await response.json();
+            this.handleLeaderboardSelectionChange({ currentKey: newDeckJson?.id });
         } catch (error) {
             console.log(error);
         }
     };
 
     componentDidMount = async () => {
-        const param = this.getUrlParam();
-        if (param) {
-            // this.handleListSubmit(param);
-        }
+        await this.refreshGridList();
 
-        this.refreshGridList();
+        const currentKey = this.getUrlParam();
+        if (currentKey) {
+           this.handleLeaderboardSelectionChange({ currentKey }) 
+        }
     }
 
-    stubDeckData = {
-        "id": "ccdf233e4ef583c3d07e2e68da09abcsdfq3r9",
-        data: {
-          "salt": 81.8462,
-          "author": "grumbledore",
-          "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-          "source": "moxfield",
-          "title": "Sen Triplets, Friendship Ruination Committee",
-          "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-          "dateLastIndexed": "",
-          "url": "https://www.moxfield.com/decks/sHgMapORlEmNzZEGb_nrRw",
-          "timesIndexed": "",
-          "id": "c7940c28156dbde0339dc204d94e7c12"
+    handlePreviewDialogDismiss = (evn) => {
+        this.setState({ selectedDeck: null });
+    }
+
+    handleLeaderboardSelectionChange = (evn) => {
+        try {
+            const {currentKey} = evn;
+            const selectedDeck = this?.state?.listItems?.filter((value, index) => {
+                return value.id === currentKey;
+            })?.[0];
+
+            window.history.pushState(null, '', `?sha=${currentKey}`);
+            this.setState({ selectedDeck: selectedDeck });
+            return;
+        } catch (error) {
+            console.log(`error :: ${error}`);
         }
-      };
+        
+        this.setState({ selectedDeck: null });
+        
+    }
 
     render() {
         const progressLabel = this?.state?.progressStatus?.label || '';
         const progressValue = this?.state?.progressStatus?.percentage || 0;
         const isFetching = this?.state?.isFetching || false;
         const items = this?.state?.listItems || [];
+        const selectedDeck = this?.state?.selectedDeck || null;
+        
         // const param = this.getUrlParam();
         
         return (
-            <View>
+            <View height="100%">
                 <View style={{position: 'absolute', top: 0}}>
                     <Header>
                         <Text size="L">EDH Salt Index</Text>
@@ -160,12 +162,13 @@ export class MainView extends React.Component {
                     <Divider size="M" />
                 </View>
                 <div style={{height: "100px"}} />
-                <View alignItems="center">
+                <View alignItems="center" height="100%">
                     <Flex 
                         direction="column"  
                         alignItems="center"
                         margin="size-200"
-                        gap="size-100" >
+                        height="100%"
+                        gap="size-100">
                         <img src="resources/chef-kiss.png" width="100px" alt="MMM SALT!" />
                         
                         <div style={{height: "50px"}} />
@@ -176,10 +179,20 @@ export class MainView extends React.Component {
                                 : <SubmitForm listSubmitHandler={this.handleListSubmit} />// initialListUrl={param} />
                             }
                         </Flex>
-                        <Preview deck={this.stubDeckData} />
-                        <div style={{height: "100px"}} />
+                        <div style={{height: "50px"}} />
+                        {selectedDeck 
+                            ? <Preview deck={selectedDeck} onDismiss={this.handlePreviewDialogDismiss} />  
+                            : <div style={{height: "0px"}} />
+                        }
                         
-                        <LeaderBoard items={items} />
+                        {/* {selectedDeck 
+                            ? <Preview deck={selectedDeck} />
+                            : <div style={{height: "100px"}} />
+                        } */}
+                        
+                        <LeaderBoard 
+                            items={items}
+                            selectionHandler={this.handleLeaderboardSelectionChange} />
                     </Flex>
                 </View>
             </View>
