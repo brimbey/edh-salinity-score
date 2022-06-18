@@ -2,18 +2,21 @@
 begin-app
 
 @http
-/api/decklist
+/api/deck
 	method get
-	src /api/decklist
+	src /api/deck
 /api/card
 	method get
 	src /api/card
 /api/leaderboard
 	method get
 	src /api/leaderboard
-/api/saltmine
+/api/flush
+	method get
+	src /api/flush
+/api/persist
 	method post
-	src /api/saltmine
+	src /api/persist
 
 @static
 folder build

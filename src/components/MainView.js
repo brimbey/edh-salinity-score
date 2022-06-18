@@ -36,7 +36,6 @@ export class MainView extends React.Component {
         for (let i = 0; i < decks?.length; i++) {
           const item = decks[i];
             data.push({
-            id: `decklist_id_${i}`,
             ...item,
           })
         };
@@ -78,7 +77,7 @@ export class MainView extends React.Component {
             window.history.pushState(null, '', `?url=${value}`);
             
             const aggregator = new Aggregator();
-            let data = await (await fetch(`/api/decklist?url=${value}`)).json()
+            let data = await (await fetch(`/api/deck?url=${value}`)).json()
 
             this.setState({
                 deckDisplayData: {
@@ -95,7 +94,7 @@ export class MainView extends React.Component {
 
             this.setState({isFetching: false});
 
-            await fetch(`/api/saltmine`, {
+            await fetch(`/api/persist`, {
                 method: "POST",
                 body: JSON.stringify({
                     url: data?.deck?.url,

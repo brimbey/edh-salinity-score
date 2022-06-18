@@ -17,7 +17,7 @@ const persistDeckList = async (body) => {
   prettyPrintJSON(body);
 
   await data.set({
-    table: 'cached-deck-list',
+    table: 'decks',
     id,
     data: { 
       ...body, 

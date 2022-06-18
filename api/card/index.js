@@ -11,7 +11,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
 
   try {
     cached = await data.get({
-      table: 'cached-card-list',
+      table: 'cards',
       key: cardname
     });
   } catch(error) {
@@ -37,7 +37,7 @@ const getEdhrecCardEntry = async (cardname = '') => {
 
     try {
       await data.set({
-        table: 'cached-card-list',
+        table: 'cards',
         key: cardname,
         data: { salt: json.salt },
       })

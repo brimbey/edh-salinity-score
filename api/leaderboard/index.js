@@ -15,7 +15,7 @@ const getSaltList = async () => {
   console.log(`GETTING SALT LISTS`);
 
   let cached = await data.get({
-    table: 'cached-deck-list',
+    table: 'decks',
   });
 
   console.log(`GOT CACHED!`);
@@ -28,6 +28,7 @@ const getSaltList = async () => {
     retData = cached.map((deck) => {
         return {
             ...deck.data,
+            id: deck.id,
             salt: formatSalt(deck.data.salt),
         }
     });
