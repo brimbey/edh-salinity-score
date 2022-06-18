@@ -1,4 +1,6 @@
 const data = require('@begin/data')
+const CryptoJS = require('crypto-js');
+
 let arc = require('@architect/functions')
 let parseBody = arc.http.helpers.bodyParser
 
@@ -7,13 +9,16 @@ const prettyPrintJSON = (json) => {
 }
 
 const persistDeckList = async (body) => {
+  console.log(`MD5 HASH => ${CryptoJS.MD5(body?.url)}`);
+  const id = CryptoJS.MD5(body?.url);
   const urlSlug = body?.url?.substring(body?.url?.lastIndexOf(`/`) + 1);
+
   console.log(`persisting data for decklist ${body.url}; slug: ${urlSlug}`);
   prettyPrintJSON(body);
 
   await data.set({
     table: 'cached-deck-list',
-    key: urlSlug,
+    id,
     data: { 
       ...body, 
       dateLastIndexed: ``,

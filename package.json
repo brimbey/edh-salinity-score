@@ -8,6 +8,7 @@
     "@adobe/react-spectrum": "^3.18.0",
     "@architect/functions": "^5.1.0",
     "@architect/utils": "^3.1.2",
+    "crypto-js": "^4.1.1",
     "node-fetch": "^2.6.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

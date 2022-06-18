@@ -7,10 +7,16 @@ const prettyPrintJSON = (json) => {
 }
 
 const getEdhrecCardEntry = async (cardname = '') => {
-  let cached = await data.get({
-    table: 'cached-card-list',
-    key: cardname
-  });
+  let cached = null;
+
+  try {
+    cached = await data.get({
+      table: 'cached-card-list',
+      key: cardname
+    });
+  } catch(error) {
+    // do nothing
+  }
 
   
   // prettyPrintJSON(cached);
@@ -29,16 +35,19 @@ const getEdhrecCardEntry = async (cardname = '') => {
     const text = await response.text();
     const json = JSON.parse(text);
 
-    await data.set({
-      table: 'cached-card-list',
-      key: cardname,
-      data: { salt: json.salt },
-    })
+    try {
+      await data.set({
+        table: 'cached-card-list',
+        key: cardname,
+        data: { salt: json.salt },
+      })
+    } catch(error) {
+      // do nothing
+    }
   
     return json;
   }
-
-  console.log(`RETURNING CACHED VALUE FOR ${cardname}: ${cached?.data?.salt}`);
+  
   return {
     salt: cached.data.salt,
   }
