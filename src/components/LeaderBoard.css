@@ -1,0 +1,5 @@
+.LeaderBoardWrapper {
+    overflow: scroll;
+    max-height: 100;
+    height: 100;
+}
