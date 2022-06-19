@@ -211,7 +211,7 @@ const getSaltList = async () => {
 
   try {
     cached = await data.get({
-      table: 'decks',
+      table: 'decks_v3',
     });
   } catch (error) {
     cached = stubData;

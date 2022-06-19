@@ -26,7 +26,8 @@ const persistDeckList = async (body) => {
 
   try {
     await data.set({
-      table: 'decks',
+      table: 'decks_v3',
+      key: id,
       ...deckData,
     })
   } catch (error) {
