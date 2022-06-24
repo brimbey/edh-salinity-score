@@ -15,7 +15,7 @@ const persistDeckList = async (body) => {
 
   console.log(`persisting data for decklist ${body.url}; slug: ${urlSlug}`);
   
-  const deckData = {
+  let deckData = {
     id,
     data: { 
       ...body, 
@@ -24,11 +24,13 @@ const persistDeckList = async (body) => {
     },
   }
 
+  deckData.data.commanders = deckData.data.commanders.toString();
+
   try {
     await data.set({
       table: 'decks_v3',
       key: id,
-      ...deckData,
+      ...deckData.data,
     })
   } catch (error) {
     console.log(`[ERROR] ${error}`)

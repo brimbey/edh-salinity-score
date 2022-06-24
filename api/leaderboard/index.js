@@ -1,202 +1,11 @@
 const data = require('@begin/data')
+const dynamo = require('@begin/data/src/helpers/_dynamo').doc
+let getTableName = require('@begin/data/src/helpers/_get-table-name')
+let getKey = require('@begin/data/src/helpers/_get-key')
 let arc = require('@architect/functions');
 // const { APIUtils } = require('../common/APIUtils');
 let parseBody = arc.http.helpers.bodyParser
 
-const stubData = [
-  {
-    "id": "ccdf233e4ef583c3d07e2e68da09abc9",
-    data: {
-        "salt": 111.3378,
-        "author": "bobkozilek",
-        "commanders": ["Ragaskankavan"],
-        "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8",
-        "source": "moxfield",
-        "title": "zur3",
-        "authorProfileUrl": "https://www.moxfield.com/users/bobkozilek",
-        "dateLastIndexed": "",
-        "url": "https://www.moxfield.com/decks/S3_OUj3m0UatiYy2VMOM8Q",
-        "timesIndexed": "",
-        "id": "ccdf233e4ef583c3d07e2e68da09abc9"
-    },
-  },
-  {
-    "id": "ccdf233e4ef583c3d07e2e68da09abcsdfq3r9",
-    data: {
-      "salt": 79,
-      "commanders": ["Ragaskankavan"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Sen Triplets, Friendship Ruination Committee",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/sHgMapORlEmNzZEGb_nrRw",
-      "timesIndexed": "",
-      "id": "c7940c28156dbde0339dc204d94e7c12"
-    }
-  },
-  {
-    "id": "ccdf233e4ef583c3d07e2e68da09abc9ds123123f",
-    data: {
-      "salt": 59,
-      "commanders": ["Ragaskankavan"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Ragavan, the Wee Arsehole",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/ba2V0uVjzUmGKGe958nmcA",
-      "timesIndexed": "",
-      "id": "e910a61ffbf537b7c3d9164850701c84"
-    }
-  },
-  {
-    "id": "25fc173802ccc249aad3edc0f7b27714",
-    data: {
-      "salt": 39,
-      "commanders": ["TESTENHOFFER"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "TOTALLY A REAL DECK YALL",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-  {
-    "id": "25fc173802ccc249aad3edc0f7b2771425fc173802ccc249aad3edc0f7b2771425fc173802ccc249aad3edc0f7b27714",
-    data: {
-      "salt": 29,
-      "commanders": ["TESTENHOFFER"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "TOTALLY A REAL DECK YALL",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-  {
-    "id": "ww3sdkjfsfkj",
-    data: {
-      "salt": 9,
-      "commanders": ["Ragaskankavan", "Sextuples"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Rakdos, Lord of Death Punchies",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-  {
-    "id": "234324324",
-    data: {
-        "salt": 111.3378,
-        "author": "bobkozilek",
-        "commanders": ["Ragaskankavan"],
-        "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-78719-65c4fa40-f937-4b65-adac-f402893cefd8",
-        "source": "moxfield",
-        "title": "zur3",
-        "authorProfileUrl": "https://www.moxfield.com/users/bobkozilek",
-        "dateLastIndexed": "",
-        "url": "https://www.moxfield.com/decks/S3_OUj3m0UatiYy2VMOM8Q",
-        "timesIndexed": "",
-        "id": "ccdf233e4ef583c3d07e2e68da09abc9"
-    },
-  },
-  {
-    "id": "546456456",
-    data: {
-      "salt": 79,
-      "commanders": ["Ragaskankavan"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Sen Triplets, Friendship Ruination Committee",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/sHgMapORlEmNzZEGb_nrRw",
-      "timesIndexed": "",
-      "id": "c7940c28156dbde0339dc204d94e7c12"
-    }
-  },
-  {
-    "id": "7567",
-    data: {
-      "salt": 59,
-      "commanders": ["Ragaskankavan"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Ragavan, the Wee Arsehole",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/ba2V0uVjzUmGKGe958nmcA",
-      "timesIndexed": "",
-      "id": "e910a61ffbf537b7c3d9164850701c84"
-    }
-  },
-  {
-    "id": "8",
-    data: {
-      "salt": 39,
-      "commanders": ["TESTENHOFFER"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "TOTALLY A REAL DECK YALL",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-  {
-    "id": "09",
-    data: {
-      "salt": 29,
-      "commanders": ["TESTENHOFFER"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "TOTALLY A REAL DECK YALL",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-  {
-    "id": "sdkjrhw3",
-    data: {
-      "salt": 9,
-      "commanders": ["Ragaskankavan", "Sextuples"],
-      "author": "grumbledore",
-      "authorAvatarUrl": "https://assets.moxfield.net/profile/profile-12325-84750aee-56a3-4a32-afd4-e393529e2622",
-      "source": "moxfield",
-      "title": "Rakdos, Lord of Death Punchies",
-      "authorProfileUrl": "https://www.moxfield.com/users/grumbledore",
-      "dateLastIndexed": "",
-      "url": "https://www.moxfield.com/decks/kchtLi5Kmk2K94zHoNlXMA",
-      "timesIndexed": "",
-      "id": "25fc173802ccc249aad3edc0f7b27714"
-    }
-  },
-]
 
 const prettyPrintJSON = (json) => {
   console.log(`${JSON.stringify(json, null, 4)}`);
@@ -209,35 +18,86 @@ const formatSalt = (value) => {
 const getSaltList = async () => {
   let cached = {};
 
-  try {
-    cached = await data.get({
-      table: 'decks_v3',
-    });
-  } catch (error) {
-    cached = stubData;
-  }
 
-  let retData = [];
+  
+  let callback
+  // let promise
+  let listData = [];
+  // if (!callback) {
+  //   promise = new Promise(function (res, rej) {
+      // callback = function _errback (err, result) {
+      //   if (err) {
+      //     console.log(`[ERROR (callback)] ${err}`);
+      //   }
+        
+      //   console.log(`RESULT`);
+      //   prettyPrintJSON(result);
+      //   listData = result;
+      //   // err ? rej(err) : res(result)
+      // };
+  //   })
+  // }
 
-  try {
-    retData = cached.map((deck) => {
-        return {
-            ...deck.data,
-            id: deck.id,
-            salt: formatSalt(deck.data.salt),
-        }
-    });
 
-    retData = retData.sort((a, b) => {
-        return b?.salt - a?.salt;
-    });
-  } catch (error) {
-    console.log(`[ERROR] ${error}`);
-    retData = [];
-  }
+  await dynamo(async (err, doc) => {
+    console.log(`sdfsdfsdf`);
+    
+    if (err) {
+      console.log(`[ERROR] ${err}`);
+      return [];
+    }
+    // if (err) callback(err)
+    // else callback(null, `decks_v3`, doc)
+    console.log(`LDFKSLDKFD`);
+    // err ? rej(err) : res(result)
+    console.log(`DOC :: ${doc}`);
 
-  // default
-  return retData;
+    let { scopeID, dataID } = getKey({})
+    // dataID = dataID.replace('#UNKNOWN', '')
+    dataID = `staging#decks_v3`;
+    console.log(`[scopeID] ${scopeID}`);
+    console.log(`[dataID] ${dataID}`);
+
+
+    let query = {
+      TableName: `begin-app-staging-data`,
+      Limit: 10,
+      // KeyConditionExpression:  '#scopeID = :scopeID and #salt > :salt',//"#status = :status and #createdAt > :createdAt",
+      KeyConditionExpression: '#scopeID = :scopeID and begins_with(#dataID, :dataID)',
+      // FilterExpression: '#salt > :salt',
+      ExpressionAttributeNames: {
+        '#scopeID': 'scopeID',
+        '#dataID': 'dataID',
+        // '#salt': 'salt',
+      },
+      ExpressionAttributeValues: {
+        ':scopeID': scopeID,
+        ':dataID': dataID,
+        // ':salt': 90,
+      }
+    }
+    // if (params.cursor) {
+    //   query.ExclusiveStartKey = JSON.parse(Buffer.from(params.cursor, 'base64').toString('utf8'))
+    // }
+    var result = await doc.query(query).promise()
+    console.log(JSON.stringify(result))
+
+    // await doc.query(query, (err, result) => {
+    //   if (err) {
+    //     console.log(`[ERROR (callback)] ${err}`);
+    //   }
+      
+    //   console.log(`RESULT`);
+    //   prettyPrintJSON(result);
+    //   listData = result;
+    //   // err ? rej(err) : res(result)
+    // })
+  })
+
+  
+
+  console.log(`RETURNING`);
+  // return data;
 }
 
 exports.handler = async function http () {

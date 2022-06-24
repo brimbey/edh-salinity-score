@@ -2,9 +2,9 @@
 begin-app
 
 @http
-/api/deck
+/api/import
 	method get
-	src /api/deck
+	src /api/import
 /api/card
 	method get
 	src /api/card
@@ -24,3 +24,20 @@ spa true
 
 @aws
 runtime nodejs16.x
+
+@tables
+data 
+	scopeID *String
+	dataID *String
+	salt **Number
+	commanders
+	ttl TTL
+
+@indexes
+data 
+	commanders *String
+	name byCommanders
+
+data
+  salt *Number
+  name bySalt

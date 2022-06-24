@@ -67,11 +67,17 @@ export class MainView extends React.Component {
 
     handleListSubmit = async (value) => {
         try {
-            this.setState({message: `loading...`});
             this.setState({isFetching: true});
+
+            this.setState({
+                progressStatus: {
+                    label: `Getting deck list...`,
+                    percentage: 0,
+                }
+            })
             
             const aggregator = new Aggregator();
-            let data = await (await fetch(`/api/deck?url=${value}`)).json()
+            let data = await (await fetch(`/api/import?url=${value}`)).json()
             const commanders = Object.keys(data?.deck?.commanders);
 
             this.setState({
@@ -84,9 +90,6 @@ export class MainView extends React.Component {
             });
 
             const total = await aggregator.parseDeckList(data?.deck?.cards, this.handleAggregatorStatusUpdate);
-
-            this.setState({message: `SALT TOTAL: ${total}`});
-            this.setState({parseStatus: ``});
 
             this.setState({isFetching: false});
 
@@ -103,6 +106,13 @@ export class MainView extends React.Component {
                     authorProfileUrl: `https://www.moxfield.com/users/${data?.deck?.author?.userName}`,
                 })
             });
+
+            this.setState({
+                progressStatus: {
+                    label: ``,
+                    percentage: 0,
+                }
+            })
 
             await this.refreshGridList();
             
