@@ -24,3 +24,9 @@ spa true
 
 @aws
 runtime nodejs16.x
+
+@tables
+data 
+	scopeID *String
+	dataID **String
+	ttl TTL
