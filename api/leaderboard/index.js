@@ -37,7 +37,12 @@ const getSaltList = async () => {
 
   waterfall([
     getTableName,
+    (TableName, callback) => { 
+      console.log(`injected ::  ${JSON.stringify(TableName)}`);
+      callback(null, TableName.replace(`data`, `decks`));
+    },
     function _dynamo (TableName, callback) {
+      console.log(`GOT TABLENAME :: ${TableName}`);
       dynamo(function done (err, doc) {
         if (err) callback(err)
         else callback(null, TableName, doc)
@@ -57,14 +62,16 @@ const getSaltList = async () => {
       let query = {
         TableName,
         Limit: params.limit || 10,
-        KeyConditionExpression: '#scopeID = :scopeID and begins_with(#dataID, :dataID)',
+        KeyConditionExpression: '#scopeID = :scopeID and #salt = :salt',
         ExpressionAttributeNames: {
           '#scopeID': 'scopeID',
-          '#dataID': 'dataID'
+          '#salt': 'salt',
+          // '#dataID': 'dataID'
         },
         ExpressionAttributeValues: {
           ':scopeID': scopeID,
-          ':dataID': dataID,
+          ':salt': 52.16020841374736, 
+          // ':dataID': dataID,
         }
       }
       if (params.cursor) {
