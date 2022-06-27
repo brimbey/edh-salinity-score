@@ -28,7 +28,5 @@ runtime nodejs16.x
 @tables
 data 
 	scopeID *String
-	dataID *String
-	salt **Number
-	commanders
+	dataID **String
 	ttl TTL
