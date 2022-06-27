@@ -3,6 +3,8 @@ const dynamo = require('@begin/data/src/helpers/_dynamo').doc
 let getTableName = require('@begin/data/src/helpers/_get-table-name')
 let getKey = require('@begin/data/src/helpers/_get-key')
 let arc = require('@architect/functions');
+let waterfall = require('run-waterfall')
+let unfmt = require('@begin/data/src/helpers/_unfmt')
 // const { APIUtils } = require('../common/APIUtils');
 let parseBody = arc.http.helpers.bodyParser
 
@@ -16,88 +18,73 @@ const formatSalt = (value) => {
 }
 
 const getSaltList = async () => {
-  let cached = {};
+  let callback;
+  let params = {
+    table: 'decks_v3'
+  };
 
-
-  
-  let callback
-  // let promise
-  let listData = [];
-  // if (!callback) {
-  //   promise = new Promise(function (res, rej) {
-      // callback = function _errback (err, result) {
-      //   if (err) {
-      //     console.log(`[ERROR (callback)] ${err}`);
-      //   }
-        
-      //   console.log(`RESULT`);
-      //   prettyPrintJSON(result);
-      //   listData = result;
-      //   // err ? rej(err) : res(result)
-      // };
-  //   })
-  // }
-
-
-  await dynamo(async (err, doc) => {
-    console.log(`sdfsdfsdf`);
-    
-    if (err) {
-      console.log(`[ERROR] ${err}`);
-      return [];
-    }
-    // if (err) callback(err)
-    // else callback(null, `decks_v3`, doc)
-    console.log(`LDFKSLDKFD`);
-    // err ? rej(err) : res(result)
-    console.log(`DOC :: ${doc}`);
-
-    let { scopeID, dataID } = getKey({})
-    // dataID = dataID.replace('#UNKNOWN', '')
-    dataID = `staging#decks_v3`;
-    console.log(`[scopeID] ${scopeID}`);
-    console.log(`[dataID] ${dataID}`);
-
-
-    let query = {
-      TableName: `begin-app-staging-data`,
-      Limit: 10,
-      // KeyConditionExpression:  '#scopeID = :scopeID and #salt > :salt',//"#status = :status and #createdAt > :createdAt",
-      KeyConditionExpression: '#scopeID = :scopeID and begins_with(#dataID, :dataID)',
-      // FilterExpression: '#salt > :salt',
-      ExpressionAttributeNames: {
-        '#scopeID': 'scopeID',
-        '#dataID': 'dataID',
-        // '#salt': 'salt',
-      },
-      ExpressionAttributeValues: {
-        ':scopeID': scopeID,
-        ':dataID': dataID,
-        // ':salt': 90,
+  // boilerplague
+  let promise
+  if (!callback) {
+    promise = new Promise(function (res, rej) {
+      callback = function _errback (err, result) {
+        console.log(`RESULT`);
+        console.log(JSON.stringify(result));
+        err ? rej(err) : res(result)
       }
-    }
-    // if (params.cursor) {
-    //   query.ExclusiveStartKey = JSON.parse(Buffer.from(params.cursor, 'base64').toString('utf8'))
-    // }
-    var result = await doc.query(query).promise()
-    console.log(JSON.stringify(result))
+    })
+  }
 
-    // await doc.query(query, (err, result) => {
-    //   if (err) {
-    //     console.log(`[ERROR (callback)] ${err}`);
-    //   }
-      
-    //   console.log(`RESULT`);
-    //   prettyPrintJSON(result);
-    //   listData = result;
-    //   // err ? rej(err) : res(result)
-    // })
+  waterfall([
+    getTableName,
+    function _dynamo (TableName, callback) {
+      dynamo(function done (err, doc) {
+        if (err) callback(err)
+        else callback(null, TableName, doc)
+      })
+    },
+    function pager (TableName, doc, callback) {
+
+      params.key = params.begin || 'UNKNOWN'
+      let { scopeID, dataID } = getKey(params)
+      dataID = dataID.replace('#UNKNOWN', '')
+      // dataID = dataID.replace('undefined', 'decks_v3')
+
+      console.log(`[scopeID] ${scopeID}`);
+      console.log(`[dataID] ${dataID}`);
+      console.log(`[TableName] ${TableName}`);
+
+      let query = {
+        TableName,
+        Limit: params.limit || 10,
+        KeyConditionExpression: '#scopeID = :scopeID and begins_with(#dataID, :dataID)',
+        ExpressionAttributeNames: {
+          '#scopeID': 'scopeID',
+          '#dataID': 'dataID'
+        },
+        ExpressionAttributeValues: {
+          ':scopeID': scopeID,
+          ':dataID': dataID,
+        }
+      }
+      if (params.cursor) {
+        query.ExclusiveStartKey = JSON.parse(Buffer.from(params.cursor, 'base64').toString('utf8'))
+      }
+      doc.query(query, callback)
+    },
+  ],
+  function paged (err, result) {
+    if (err) callback(err)
+    else {
+      let exact = item => item.table === params.table
+      let returns = result.Items.map(unfmt).filter(exact)
+      if (result.LastEvaluatedKey)
+        returns.cursor = Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString('base64')
+      callback(null, returns)
+    }
   })
 
-  
-
-  console.log(`RETURNING`);
-  // return data;
+  return promise
 }
 
 exports.handler = async function http () {
