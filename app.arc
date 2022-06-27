@@ -32,12 +32,3 @@ data
 	salt **Number
 	commanders
 	ttl TTL
-
-@indexes
-data 
-	commanders *String
-	name byCommanders
-
-data
-  salt *Number
-  name bySalt
