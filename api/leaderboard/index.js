@@ -39,7 +39,8 @@ const getSaltList = async () => {
     getTableName,
     (TableName, callback) => { 
       console.log(`injected ::  ${JSON.stringify(TableName)}`);
-      callback(null, TableName.replace(`data`, `decks`));
+      const tableName = TableName.substring(0, TableName.lastIndexOf(`data`));
+      callback(null, `${tableName}decks`);
     },
     function _dynamo (TableName, callback) {
       console.log(`GOT TABLENAME :: ${TableName}`);

@@ -63,8 +63,9 @@ const persistDeckList = async (body) => {
       },
       function getTable (Item, callback) {
         getTableName(function done (err, TableName) {
+          const tableName = TableName.substring(0, TableName.lastIndexOf(`data`));
           if (err) callback(err)
-          else callback(null, TableName.replace(`data`, `decks`), Item)
+          else callback(null, `${tableName}decks`, Item)
         })
       },
       function _dynamo (TableName, Item, callback) {
